@@ -55,6 +55,7 @@
       list-style: none;
       margin: 0 0 0 15px;
       padding: 0;
+      display: none; /* Keep sidebar collapsed */
     }
     a {
       text-decoration: none;
@@ -72,7 +73,7 @@
       margin-right: 5px;
     }
     .collapsible-section {
-      display: none;
+      display: block; /* Expand all H2 sections by default */
       margin-left: 20px;
     }
     pre code {
@@ -101,36 +102,38 @@
     document.addEventListener("DOMContentLoaded", function() {
       var toggles = document.querySelectorAll(".sidebar-toggle");
       toggles.forEach(function(toggle) {
+        var ul = toggle.parentElement.querySelector("ul");
         toggle.addEventListener("click", function() {
-          var ul = this.parentElement.querySelector("ul");
-          if (!ul) return;
-          if (ul.style.display === "none" || ul.style.display === "") {
-            ul.style.display = "block";
-            this.textContent = "- ";
-          } else {
-            ul.style.display = "none";
-            this.textContent = "+ ";
+          if (ul) {
+            if (ul.style.display === "none" || ul.style.display === "") {
+              ul.style.display = "block";
+              toggle.textContent = "- ";
+            } else {
+              ul.style.display = "none";
+              toggle.textContent = "+ ";
+            }
           }
         });
       });
 
       var h2Toggles = document.querySelectorAll(".h2-toggle");
       h2Toggles.forEach(function(btn) {
+        var collapsible = btn.parentNode.nextElementSibling;
+        if (collapsible && collapsible.classList.contains("collapsible-section")) {
+          collapsible.style.display = "block"; // Expand all H2 sections
+          btn.textContent = "-"; // Update toggle button
+        }
         btn.addEventListener("click", function() {
-          var collapsible = this.parentNode.nextElementSibling;
-          if (collapsible && collapsible.classList.contains("collapsible-section")) {
-            if (collapsible.style.display === "none" || collapsible.style.display === "") {
-              collapsible.style.display = "block";
-              this.textContent = "-";
-            } else {
-              collapsible.style.display = "none";
-              this.textContent = "+";
-            }
+          if (collapsible.style.display === "none") {
+            collapsible.style.display = "block";
+            btn.textContent = "-";
+          } else {
+            collapsible.style.display = "none";
+            btn.textContent = "+";
           }
         });
       });
 
-      // Expand section and adjust scrolling for fixed header
       function expandSectionFromHash() {
         if (window.location.hash) {
           var targetId = window.location.hash.substring(1); 
@@ -142,12 +145,11 @@
               var toggleBtn = targetElement.querySelector(".h2-toggle");
               if (toggleBtn) toggleBtn.textContent = "-";
               
-              // Scroll into view with offset for fixed header
               setTimeout(function() {
                 var headerHeight = document.querySelector(".header").offsetHeight;
                 var elementPosition = targetElement.getBoundingClientRect().top + window.scrollY;
                 window.scrollTo({ top: elementPosition - headerHeight - 10, behavior: "smooth" });
-              }, 100); // Small delay to ensure it's fully expanded
+              }, 100);
             }
           }
         }

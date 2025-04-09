@@ -142,7 +142,7 @@ def build_sidebar(site_map):
 
     return str(root_ul)
 
-def create_webpages_with_sidebar(readme_dir, output_dir, template_file="template.html"):
+def create_webpages_with_sidebar(readme_dir, output_dir, template_file="template_pdf.html"):
     os.makedirs(output_dir, exist_ok=True)
     env = Environment(loader=FileSystemLoader(os.path.dirname(os.path.abspath(__file__))))
     template = env.get_template(template_file)
